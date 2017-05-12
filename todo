@@ -1,0 +1,5 @@
+sentence = "This is an ex."
+
+justify(sentence, 7)
+
+"This is\nan  ex."
