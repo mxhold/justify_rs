@@ -7,37 +7,59 @@
 //     }
 // }
 
-pub fn justify(input: &str, desired_line_length: u8) -> String {
+pub fn justify(input: &str, desired_line_length: usize) -> String {
     let mut output = String::new();
 
     let mut line: Vec<String> = Vec::new();
-    let mut line_length: u8 = 0;
 
     let mut word = String::new();
-    let mut word_length: u8 = 0;
 
     // TODO: split by graphemes instead
     for character in input.chars() {
         if character == ' ' {
-            if line_length + word_length <= desired_line_length {
+            let line_word_length: usize = line.iter().map(|w| w.len()).sum();
+            let line_length_with_spaces = line_word_length + line.len().saturating_sub(1);
+            let word_length = word.len();
+
+            if line_length_with_spaces + word_length <= desired_line_length {
+                println!("[1] line: {:?}, word: {:?}", line, word);
                 line.push(word.clone());
-                line_length += word_length + 1;
-                word_length = 0;
                 word.clear();
             } else {
-                let mut joined_line = line.join(" ");
+                println!("[2] line: {:?}, word: {:?}", line, word);
+                let mut spaces_to_add = desired_line_length - line_word_length;
+                let space_positions = line.len() - 1;
+
+                let spaces_for_each = spaces_to_add / space_positions;
+                let mut remainder = spaces_to_add % space_positions;
+
+                let mut joined_line = String::new();
+
+                let final_word = line.pop().unwrap();
+                for word in &line {
+                    joined_line.push_str(&word);
+                    for _ in 0..spaces_for_each {
+                        joined_line.push(' ');
+                    }
+                    if remainder > 0 {
+                        joined_line.push(' ');
+                        remainder -= 1;
+                    }
+                }
+                joined_line.push_str(&final_word);
                 joined_line.push('\n');
                 output.push_str(&joined_line);
                 line.clear();
-                line_length = 0;
+                line.push(word.clone());
+                word.clear();
             }
         } else {
             word.push(character);
-            word_length += 1;
         }
 
     }
 
+    println!("[3] line: {:?}, word: {:?}", line, word);
     line.push(word.clone());
     let mut joined_line = line.join(" ");
     joined_line.push('\n');
@@ -57,6 +79,6 @@ mod tests {
     #[test]
     fn it_justifies() {
         let output = justify("hello world my name is computer", 16);
-        assert_eq!(output, "hello  world  my\nname is computer");
+        assert_eq!(output, "hello  world  my\nname is computer\n");
     }
 }
