@@ -16,17 +16,19 @@ pub fn justify(input: &str, desired_line_length: usize) -> String {
 
     // TODO: split by graphemes instead
     for character in input.chars() {
-        if character == ' ' {
+        if character == ' ' || character == '\n' {
             let line_word_length: usize = line.iter().map(|w| w.len()).sum();
-            let line_length_with_spaces = line_word_length + line.len().saturating_sub(1);
+            let line_length_with_spaces = line_word_length + line.len();
             let word_length = word.len();
 
+            println!("{:?} {:?}", word_length, word);
+
             if line_length_with_spaces + word_length <= desired_line_length {
-                println!("[1] line: {:?}, word: {:?}", line, word);
+                //println!("[1] line: {:?}, word: {:?}", line, word);
                 line.push(word.clone());
                 word.clear();
             } else {
-                println!("[2] line: {:?}, word: {:?}", line, word);
+               // println!("[2] line: {:?}, word: {:?}", line, word);
                 let mut spaces_to_add = desired_line_length - line_word_length;
                 let space_positions = line.len() - 1;
 
@@ -59,7 +61,7 @@ pub fn justify(input: &str, desired_line_length: usize) -> String {
 
     }
 
-    println!("[3] line: {:?}, word: {:?}", line, word);
+   // println!("[3] line: {:?}, word: {:?}", line, word);
     line.push(word.clone());
     let mut joined_line = line.join(" ");
     joined_line.push('\n');
